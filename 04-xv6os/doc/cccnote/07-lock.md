@@ -233,3 +233,10 @@ Figure 8.2: Sample code for mutual exclusion. a0 contains the address of the loc
 
 一旦 acquire()/release() 這樣的函數建構完成後，我們就能在 xv6 核心中運用鎖定機制避免競爭情況，確保臨界區間的存取不會出問題了。
 
+## 節與
+
+現在已經到了我們這趟 xv6 之旅的最後一站。
+
+希望透過這一系列的 xv6 原始碼閱讀筆記，可以幫助大家理解作業系統是如何設計出來的。
+
+畢竟，基於 RISC-V 處理器，核心只有八千行的 xv6，是我門研究作業系統的良好標的，讓我們可以站在 Ken Thompson, Dennis Richie, 還有 xv6 創建者 Frans Kaashoek, Robert Morris, 與 Russ Cox 等人的肩膀上，看清楚作業系統這個重要領域的技術細節，這是單單閱讀作業系統教科書所難以學會的事情。
