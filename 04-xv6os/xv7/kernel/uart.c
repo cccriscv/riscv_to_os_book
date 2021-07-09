@@ -181,10 +181,10 @@ uartintr(void)
 {
   // read and process incoming characters.
   while(1){
-    int c = uartgetc();
+    int c = uartgetc(); // 讀取一個字元
     if(c == -1)
       break;
-    consoleintr(c);
+    consoleintr(c); // 呼叫 consoleintr 處理該字元。
   }
 
   // send buffered characters.

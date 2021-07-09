@@ -14,7 +14,7 @@ extern char trampoline[], uservec[], userret[];
 // in kernelvec.S, calls kerneltrap().
 void kernelvec();
 
-extern int devintr();
+extern int devintr(); // 外部裝置中斷
 
 void
 trapinit(void)
@@ -26,7 +26,7 @@ trapinit(void)
 void
 trapinithart(void)
 {
-  w_stvec((uint64)kernelvec);
+  w_stvec((uint64)kernelvec); // 設定核心的中斷函數為 kernelvec
 }
 
 //
@@ -34,7 +34,7 @@ trapinithart(void)
 // called from trampoline.S
 //
 void
-usertrap(void)
+usertrap(void) // 使用者中斷 (自陷 trap)
 {
   int which_dev = 0;
 
@@ -160,7 +160,7 @@ kerneltrap()
 }
 
 void
-clockintr()
+clockintr() // 時間中斷
 {
   acquire(&tickslock);
   ticks++;
@@ -174,7 +174,7 @@ clockintr()
 // 1 if other device,
 // 0 if not recognized.
 int
-devintr()
+devintr() // 裝置中斷
 {
   uint64 scause = r_scause();
 

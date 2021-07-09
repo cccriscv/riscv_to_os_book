@@ -1,13 +1,12 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <string.h>
-// #include <assert.h>
+// #include "mylib.h"
+#include "kernel/types.h"
+#include "kernel/stat.h"
+#include "user/user.h"
+#include "kernel/fs.h"
+#include "kernel/fcntl.h"
 
-#define K 1024
-#define TMAX (512*K)
-#define SMAX K
+#define SMAX 128
+#define TMAX 1024
 
 char text[TMAX], newText[TMAX], block[TMAX];
 
@@ -21,7 +20,7 @@ int readFile(char *fname, char *text, int n) {
 }
 
 void writeFile(char *fname, char *text) {
-  int fd = open(fname, O_CREAT|O_RDWR|O_TRUNC, 644); // fd = open(fname, O_CREAT|O_WRONLY|O_TRUNC); 
+  int fd = open(fname, O_CREATE|O_RDWR|O_TRUNC); // fd = open(fname, O_CREAT|O_WRONLY|O_TRUNC); , 644
   // assert(fd>0);
   write(fd, text, strlen(text));
   close(fd);
@@ -31,11 +30,11 @@ int inputText(char *text) {
   printf("input lines until <end>\n");
   char *p = text;
   while (1) {
-    gets(p);
+    gets(p, SMAX);
     // printf("p=%s len=%d\n", p, strlen(p));
     if (memcmp(p, "<end>", 5)==0) break;
     p += strlen(p);
-    *p++ = '\n';
+    // *p++ = '\n';
   }
   *p = '\0';
   return p-text;
@@ -47,12 +46,16 @@ void replace0(char *text, int lmin, int lmax, char *block, char *newText) {
   while (1) {
     char *start = p;
     while (*p != '\n') {
-      if (*p == '\0') break; // { strcpy(np, start); printf("newText=%s\n", newText); return; }
+      if (*p == '\0') break;
       p++;
     }
     line++;
     if (line>=lmin && line<=lmax) {
-      printf("%d: %.*s\n", line, (int) (p-start), start);
+      char linestr[SMAX];
+      memcpy(linestr, start, p-start);
+      linestr[p-start] = '\0';
+      printf("%d: %s\n", line, linestr);
+      // printf("%d: %.*s\n", line, (int) (p-start), start);
     } else { // if (line<lmin || line > lmax)
       memcpy(np, start, p-start);
       np += p-start;
@@ -94,9 +97,10 @@ void editor(char *fname) {
   while (1) {
     int lmin=0, lmax=TMAX;
     printf("? ");
-    gets(cmd);
-    sscanf(cmd, "%s %d %d", op, &lmin, &lmax);
-    // printf("op=%s lmin=%d lmax=%d\n", op, lmin, lmax);
+    gets(cmd, SMAX);
+    printf("cmd=%s\n", cmd);
+    int count = sscanf(cmd, "%s %d %d", op, &lmin, &lmax);
+    printf("count=%d op=%s lmin=%d lmax=%d\n", count, op, lmin, lmax);
     switch (*op) {
       case 'h': printf("h:help l:list i:insert r:replace d:delete q:quit\n"); break; // help
       case 'l': list(lmin, lmax); break;      // list file from min to max
@@ -106,7 +110,7 @@ void editor(char *fname) {
       case 's': writeFile(fname, text); break; 
       case 'q': // quit
         printf("save file (Y/N) ? ");
-        gets(ans);
+        gets(ans, SMAX);
         if (*ans == 'Y' || *ans == 'y') writeFile(fname, text);
         exit(0);
         break;

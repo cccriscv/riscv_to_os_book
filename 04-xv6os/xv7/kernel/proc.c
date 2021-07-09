@@ -277,31 +277,31 @@ fork(void)
   struct proc *p = myproc();
 
   // Allocate process.
-  if((np = allocproc()) == 0){
+  if((np = allocproc()) == 0){ // 分配新的子行程
     return -1;
   }
 
   // Copy user memory from parent to child.
-  if(uvmcopy(p->pagetable, np->pagetable, p->sz) < 0){
+  if(uvmcopy(p->pagetable, np->pagetable, p->sz) < 0){ // 將分頁表複製給子行程。
     freeproc(np);
     release(&np->lock);
     return -1;
   }
-  np->sz = p->sz;
+  np->sz = p->sz; // 子行程大小和父行程相同
 
   // copy saved user registers.
-  *(np->trapframe) = *(p->trapframe);
+  *(np->trapframe) = *(p->trapframe); // 暫存器也相同
 
   // Cause fork to return 0 in the child.
-  np->trapframe->a0 = 0;
+  np->trapframe->a0 = 0; // 子行程的 fork 傳回值應為 0 (注意，父行程傳回值沒修改)
 
   // increment reference counts on open file descriptors.
   for(i = 0; i < NOFILE; i++)
     if(p->ofile[i])
-      np->ofile[i] = filedup(p->ofile[i]);
-  np->cwd = idup(p->cwd);
+      np->ofile[i] = filedup(p->ofile[i]); // 複製檔案表
+  np->cwd = idup(p->cwd); // 複製 cwd 目前目錄 
 
-  safestrcpy(np->name, p->name, sizeof(p->name));
+  safestrcpy(np->name, p->name, sizeof(p->name)); // 複製名稱
 
   pid = np->pid;
 
@@ -312,7 +312,7 @@ fork(void)
   release(&wait_lock);
 
   acquire(&np->lock);
-  np->state = RUNNABLE;
+  np->state = RUNNABLE; // 設定子行程為 RUNNABLE
   release(&np->lock);
 
   return pid;

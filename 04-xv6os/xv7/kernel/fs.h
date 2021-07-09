@@ -11,15 +11,15 @@
 //
 // mkfs computes the super block and builds an initial file system. The
 // super block describes the disk layout:
-struct superblock {
-  uint magic;        // Must be FSMAGIC
-  uint size;         // Size of file system image (blocks)
-  uint nblocks;      // Number of data blocks
-  uint ninodes;      // Number of inodes.
-  uint nlog;         // Number of log blocks
-  uint logstart;     // Block number of first log block
-  uint inodestart;   // Block number of first inode block
-  uint bmapstart;    // Block number of first free map block
+struct superblock { // 超級區塊
+  uint magic;        // Must be FSMAGIC      // 用來辨識的魔數:0x10203040
+  uint size;         // Size of file system image (blocks) // 全部區塊數
+  uint nblocks;      // Number of data blocks // 資料區塊數
+  uint ninodes;      // Number of inodes.     // inodes 數量
+  uint nlog;         // Number of log blocks  // 日誌 log 的區塊數
+  uint logstart;     // Block number of first log block   // log 的首區塊
+  uint inodestart;   // Block number of first inode block // inode 的首區塊
+  uint bmapstart;    // Block number of first free map block // free bitmap 的首區塊
 };
 
 #define FSMAGIC 0x10203040

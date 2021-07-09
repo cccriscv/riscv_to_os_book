@@ -1,3 +1,8 @@
+#include <stdarg.h>
+#include "kernel/types.h"
+// #include "kernel/stat.h"
+// #include "kernel/fcntl.h"
+
 struct stat;
 struct rtcdate;
 
@@ -40,3 +45,6 @@ void free(void*);
 int atoi(const char*);
 int memcmp(const void *, const void *, uint);
 void *memcpy(void *, const void *, uint);
+
+int vsscanf(const char *text, const char *fmt, va_list vl);
+int sscanf(const char *text, const char *fmt, ...);

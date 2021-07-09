@@ -8,7 +8,7 @@
 .globl kernelvec
 .align 4
 kernelvec:
-        // make room to save registers.
+        // make room to save registers. # 分配堆疊以儲存暫存器
         addi sp, sp, -256
 
         // save the registers.
@@ -44,10 +44,10 @@ kernelvec:
         sd t5, 232(sp)
         sd t6, 240(sp)
 
-	// call the C trap handler in trap.c
+	// call the C trap handler in trap.c # 呼叫 C 語言的 kerneltrap() 函數。
         call kerneltrap
 
-        // restore registers.
+        // restore registers. // 恢復暫存器
         ld ra, 0(sp)
         ld sp, 8(sp)
         ld gp, 16(sp)
@@ -80,13 +80,13 @@ kernelvec:
         ld t5, 232(sp)
         ld t6, 240(sp)
 
-        addi sp, sp, 256
+        addi sp, sp, 256 # 恢復堆疊指標
 
         // return to whatever we were doing in the kernel.
         sret
 
         #
-        # machine-mode timer interrupt.
+        # machine-mode timer interrupt. 機器模式的時間中斷
         #
 .globl timervec
 .align 4
@@ -96,12 +96,12 @@ timervec:
         # scratch[24] : address of CLINT's MTIMECMP register.
         # scratch[32] : desired interval between interrupts.
         
-        csrrw a0, mscratch, a0
+        csrrw a0, mscratch, a0  # 儲存到暫存區
         sd a1, 0(a0)
         sd a2, 8(a0)
         sd a3, 16(a0)
 
-        # schedule the next timer interrupt
+        # schedule the next timer interrupt # 設定下一次中斷時間
         # by adding interval to mtimecmp.
         ld a1, 24(a0) # CLINT_MTIMECMP(hart)
         ld a2, 32(a0) # interval
@@ -109,11 +109,12 @@ timervec:
         add a3, a3, a2
         sd a3, 0(a1)
 
-        # raise a supervisor software interrupt.
+        # raise a supervisor software interrupt. 
+        # 引發核心中斷，跳到 kernelvec=>kerneltrap()
 	li a1, 2
         csrw sip, a1
 
-        ld a3, 16(a0)
+        ld a3, 16(a0)  # 從暫存區取回暫存器
         ld a2, 8(a0)
         ld a1, 0(a0)
         csrrw a0, mscratch, a0
