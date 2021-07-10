@@ -23,10 +23,11 @@ int puts(const char *s);
 char *gets(char *s);
 int vsprintf(char *text, const char *fmt, va_list ap);
 int sprintf(char *text, const char *fmt, ...);
-int printf1(const char *fmt, ...);
+// int printf1(const char *fmt, ...);
+int printf(const char *fmt, ...);
 int sscanf(const char *text, const char *fmt, ...);
 
 #define TMAX 8192
-#define printf printf1
+// #define printf printf1
 
 #endif

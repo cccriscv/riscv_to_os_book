@@ -60,7 +60,7 @@ printptr(uint64 x)
 }
 
 // Print to the console. only understands %d, %x, %p, %s.
-void
+int
 printf(char *fmt, ...)
 {
   va_list ap;
@@ -112,6 +112,7 @@ printf(char *fmt, ...)
 
   if(locking)
     release(&pr.lock);
+  return i;
 }
 
 void

@@ -6,12 +6,21 @@
 
 // Written by Robert Swierczek
 // 修改者: 陳鍾誠 (模組化並加上中文註解)
-
+/*
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
 #include <unistd.h>
 #include <fcntl.h>
+// #define int long long
+*/
+#include "kernel/types.h"
+#include "kernel/stat.h"
+#include "user/user.h"
+#include "kernel/fs.h"
+#include "kernel/fcntl.h"
+// #include "kernel/defs.h"
+// #include "user/mylib.h"
 
 char *p, *lp, // current position in source code (p: 目前原始碼指標, lp: 上一行原始碼指標)
      *data;   // data/bss pointer (資料段機器碼指標)
@@ -489,6 +498,7 @@ int run(int *pc, int *bp, int *sp) { // 虛擬機 => pc: 程式計數器, sp: �
     else if (i == EXIT) { printf("exit(%d) cycle = %d\n", *sp, cycle); return *sp; } // EXIT 離開
     else { printf("unknown instruction = %d! cycle = %d\n", i, cycle); return -1; } // 錯誤處理
   }
+  return 0;
 }
 
 int main(int argc, char **argv) // 主程式
@@ -496,6 +506,7 @@ int main(int argc, char **argv) // 主程式
   int fd, ty, poolsz, *idmain;
   int *pc, *bp, *sp;
   int i, *t;
+  int *_e, *_sp, *_p;
 
   --argc; ++argv;
   if (argc > 0 && **argv == '-' && (*argv)[1] == 's') { src = 1; --argc; ++argv; }
@@ -505,10 +516,11 @@ int main(int argc, char **argv) // 主程式
   if ((fd = open(*argv, 0)) < 0) { printf("could not open(%s)\n", *argv); return -1; }
 
   poolsz = 256*1024; // arbitrary size
+
   if (!(sym = malloc(poolsz))) { printf("could not malloc(%d) symbol area\n", poolsz); return -1; } // 符號段
-  if (!(le = e = malloc(poolsz))) { printf("could not malloc(%d) text area\n", poolsz); return -1; } // 程式段
+  if (!(_e=le = e = malloc(poolsz))) { printf("could not malloc(%d) text area\n", poolsz); return -1; } // 程式段
   if (!(data = malloc(poolsz))) { printf("could not malloc(%d) data area\n", poolsz); return -1; } // 資料段
-  if (!(sp = malloc(poolsz))) { printf("could not malloc(%d) stack area\n", poolsz); return -1; }  // 堆疊段
+  if (!(_sp=sp = malloc(poolsz))) { printf("could not malloc(%d) stack area\n", poolsz); return -1; }  // 堆疊段
 
   memset(sym,  0, poolsz);
   memset(e,    0, poolsz);
@@ -521,7 +533,7 @@ int main(int argc, char **argv) // 主程式
   next(); id[Tk] = Char; // handle void type
   next(); idmain = id; // keep track of main
 
-  if (!(lp = p = malloc(poolsz))) { printf("could not malloc(%d) source area\n", poolsz); return -1; }
+  if (!(_p= lp = p = malloc(poolsz))) { printf("could not malloc(%d) source area\n", poolsz); return -1; }
   if ((i = read(fd, p, poolsz-1)) <= 0) { printf("read() returned %d\n", i); return -1; }
   p[i] = 0; // 設定程式 p 字串結束符號 \0
   close(fd);
@@ -530,7 +542,6 @@ int main(int argc, char **argv) // 主程式
 
   if (!(pc = (int *)idmain[Val])) { printf("main() not defined\n"); return -1; }
   if (src) return 0;
-
   // setup stack
   bp = sp = (int *)((int)sp + poolsz);
   *--sp = EXIT; // call exit if main returns
@@ -538,5 +549,14 @@ int main(int argc, char **argv) // 主程式
   *--sp = argc;
   *--sp = (int)argv;
   *--sp = (int)t;
-  return run(pc, bp, sp);
+  run(pc, bp, sp);
+  free(sym);
+  free(data);
+  free(_sp);
+  free(_e);
+  free(_p);
+  // printf("run finished!\n");
+
+  exit(0);
+  // return 0;
 }

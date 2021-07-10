@@ -98,9 +98,10 @@ void editor(char *fname) {
     int lmin=0, lmax=TMAX;
     printf("? ");
     gets(cmd, SMAX);
-    printf("cmd=%s\n", cmd);
-    int count = sscanf(cmd, "%s %d %d", op, &lmin, &lmax);
-    printf("count=%d op=%s lmin=%d lmax=%d\n", count, op, lmin, lmax);
+    // printf("cmd=%s\n", cmd);
+    // int count = sscanf(cmd, "%s %d %d", op, &lmin, &lmax);
+    sscanf(cmd, "%s %d %d", op, &lmin, &lmax);
+    // printf("count=%d op=%s lmin=%d lmax=%d\n", count, op, lmin, lmax);
     switch (*op) {
       case 'h': printf("h:help l:list i:insert r:replace d:delete q:quit\n"); break; // help
       case 'l': list(lmin, lmax); break;      // list file from min to max
@@ -114,7 +115,7 @@ void editor(char *fname) {
         if (*ans == 'Y' || *ans == 'y') writeFile(fname, text);
         exit(0);
         break;
-      default: printf("error: op=%s not found!", op);
+      default: printf("error: op=%s not found!\n", op);
     }
   }
 }

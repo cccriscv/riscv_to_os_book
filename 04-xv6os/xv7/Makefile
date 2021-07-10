@@ -103,6 +103,9 @@ $U/usys.S : $U/usys.pl
 $U/usys.o : $U/usys.S
 	$(CC) $(CFLAGS) -c -o $U/usys.o $U/usys.S
 
+$U/c4.o : $U/c4.c
+	$(CC) -w $(CFLAGS) -c -o $U/c4.o $U/c4.c
+
 $U/_forktest: $U/forktest.o $(ULIB)
 	# forktest has less library code linked in - needs to be small
 	# in order to be able to max out the proc table.
@@ -136,9 +139,11 @@ UPROGS=\
 	$U/_wc\
 	$U/_zombie\
 	$U/_editor\
+	$U/_c4\
+	$U/_cp\
 
-fs.img: mkfs/mkfs README $(UPROGS)
-	mkfs/mkfs fs.img README $(UPROGS)
+fs.img: mkfs/mkfs README hello.c sum.c fib.c arg.c $(UPROGS)
+	mkfs/mkfs fs.img README hello.c sum.c fib.c arg.c $(UPROGS)
 
 -include kernel/*.d user/*.d
 
