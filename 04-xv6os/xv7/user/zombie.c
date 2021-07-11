@@ -1,9 +1,7 @@
 // Create a zombie process that
 // must be reparented at exit.
 
-#include "kernel/types.h"
-#include "kernel/stat.h"
-#include "user/user.h"
+#include "lib/lib.h"
 
 int
 main(void)

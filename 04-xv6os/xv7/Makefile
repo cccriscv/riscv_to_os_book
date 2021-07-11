@@ -1,5 +1,6 @@
 K=kernel
 U=user
+L=lib
 
 OBJS = \
   $K/entry.o \
@@ -90,7 +91,8 @@ $U/initcode: $U/initcode.S
 tags: $(OBJS) _init
 	etags *.S *.c
 
-ULIB = $U/ulib.o $U/sscanf.o $U/usys.o $U/printf.o $U/umalloc.o
+# ULIB = $U/ulib.o $U/sscanf.o $U/usys.o $U/printf.o $U/umalloc.o
+ULIB = $L/ulib.o $L/sscanf.o $U/usys.o $L/printf.o $L/umalloc.o
 
 _%: %.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
@@ -99,6 +101,8 @@ _%: %.o $(ULIB)
 
 $U/usys.S : $U/usys.pl
 	perl $U/usys.pl > $U/usys.S
+# $U/usys.S : $U/usys0.S
+#	$(CC) $(CFLAGS) -E $U/usys0.S -o $U/usys.S
 
 $U/usys.o : $U/usys.S
 	$(CC) $(CFLAGS) -c -o $U/usys.o $U/usys.S
@@ -109,7 +113,7 @@ $U/c4.o : $U/c4.c
 $U/_forktest: $U/forktest.o $(ULIB)
 	# forktest has less library code linked in - needs to be small
 	# in order to be able to max out the proc table.
-	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $U/_forktest $U/forktest.o $U/ulib.o $U/usys.o
+	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $U/_forktest $U/forktest.o $L/ulib.o $U/usys.o
 	$(OBJDUMP) -S $U/_forktest > $U/forktest.asm
 
 mkfs/mkfs: mkfs/mkfs.c $K/fs.h $K/param.h
@@ -142,8 +146,10 @@ UPROGS=\
 	$U/_c4\
 	$U/_cp\
 
-fs.img: mkfs/mkfs README hello.c sum.c fib.c arg.c $(UPROGS)
-	mkfs/mkfs fs.img README hello.c sum.c fib.c arg.c $(UPROGS)
+DOCS = doc/README.md doc/hello.c doc/sum.c doc/fib.c doc/arg.c
+
+fs.img: mkfs/mkfs $(DOCS) $(UPROGS)
+	mkfs/mkfs fs.img $(DOCS) $(UPROGS)
 
 -include kernel/*.d user/*.d
 

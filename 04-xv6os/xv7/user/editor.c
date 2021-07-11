@@ -1,9 +1,11 @@
-// #include "mylib.h"
+/*
 #include "kernel/types.h"
 #include "kernel/stat.h"
-#include "user/user.h"
+#include "lib/lib.h"
 #include "kernel/fs.h"
 #include "kernel/fcntl.h"
+*/
+#include "lib/lib.h"
 
 #define SMAX 128
 #define TMAX 1024

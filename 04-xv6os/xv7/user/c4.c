@@ -14,13 +14,7 @@
 #include <fcntl.h>
 // #define int long long
 */
-#include "kernel/types.h"
-#include "kernel/stat.h"
-#include "user/user.h"
-#include "kernel/fs.h"
-#include "kernel/fcntl.h"
-// #include "kernel/defs.h"
-// #include "user/mylib.h"
+#include "lib/lib.h"
 
 char *p, *lp, // current position in source code (p: 目前原始碼指標, lp: 上一行原始碼指標)
      *data;   // data/bss pointer (資料段機器碼指標)
